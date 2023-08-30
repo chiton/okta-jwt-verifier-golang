@@ -39,7 +39,7 @@ import (
 
 func Test_the_verifier_defaults_to_oidc_if_nothing_is_provided_for_discovery(t *testing.T) {
 	jvs := JwtVerifier{
-		Issuer: "issuer",
+		Issuers: []string{"issuer"},
 	}
 
 	jv, _ := jvs.New()
@@ -52,7 +52,7 @@ func Test_the_verifier_defaults_to_oidc_if_nothing_is_provided_for_discovery(t *
 
 func Test_the_verifier_defaults_to_lestrratGoJwx_if_nothing_is_provided_for_adaptor(t *testing.T) {
 	jvs := JwtVerifier{
-		Issuer: "issuer",
+		Issuers: []string{"issuer"},
 	}
 
 	jv, _ := jvs.New()
@@ -63,9 +63,9 @@ func Test_the_verifier_defaults_to_lestrratGoJwx_if_nothing_is_provided_for_adap
 	}
 }
 
-func Test_can_validate_iss_from_issuer_provided(t *testing.T) {
+func Test_cannot_validate_iss_from_issuer_provided(t *testing.T) {
 	jvs := JwtVerifier{
-		Issuer: "https://golang.oktapreview.com",
+		Issuers: []string{"https://golang.oktapreview.com"},
 	}
 
 	jv, _ := jvs.New()
@@ -76,12 +76,25 @@ func Test_can_validate_iss_from_issuer_provided(t *testing.T) {
 	}
 }
 
+func Test_can_validate_iss_from_issuer_provided(t *testing.T) {
+	jvs := JwtVerifier{
+		Issuers: []string{"https://golang.oktapreview.com", "test"},
+	}
+
+	jv, _ := jvs.New()
+
+	err := jv.validateIss("test")
+	if err != nil {
+		t.Errorf("the issuer validation triggered an error")
+	}
+}
+
 func Test_can_validate_nonce(t *testing.T) {
 	tv := map[string]string{}
 	tv["nonce"] = "abc123"
 
 	jvs := JwtVerifier{
-		Issuer:           "https://golang.oktapreview.com",
+		Issuers:          []string{"https://golang.oktapreview.com"},
 		ClaimsToValidate: tv,
 	}
 
@@ -98,7 +111,7 @@ func Test_can_validate_aud(t *testing.T) {
 	tv["aud"] = "abc123"
 
 	jvs := JwtVerifier{
-		Issuer:           "https://golang.oktapreview.com",
+		Issuers:          []string{"https://golang.oktapreview.com"},
 		ClaimsToValidate: tv,
 	}
 
@@ -115,7 +128,7 @@ func Test_can_validate_cid(t *testing.T) {
 	tv["cid"] = "abc123"
 
 	jvs := JwtVerifier{
-		Issuer:           "https://golang.oktapreview.com",
+		Issuers:          []string{"https://golang.oktapreview.com"},
 		ClaimsToValidate: tv,
 	}
 
@@ -129,7 +142,7 @@ func Test_can_validate_cid(t *testing.T) {
 
 func Test_can_validate_iat(t *testing.T) {
 	jvs := JwtVerifier{
-		Issuer: "https://golang.oktapreview.com",
+		Issuers: []string{"https://golang.oktapreview.com"},
 	}
 
 	jv, _ := jvs.New()
@@ -149,7 +162,7 @@ func Test_can_validate_iat(t *testing.T) {
 
 func Test_can_validate_exp(t *testing.T) {
 	jvs := JwtVerifier{
-		Issuer: "https://golang.oktapreview.com",
+		Issuers: []string{"https://golang.oktapreview.com"},
 	}
 
 	jv, _ := jvs.New()
@@ -170,7 +183,7 @@ func Test_can_validate_exp(t *testing.T) {
 // ID TOKEN TESTS
 func Test_invalid_formatting_of_id_token_throws_an_error(t *testing.T) {
 	jvs := JwtVerifier{
-		Issuer: "https://golang.oktapreview.com",
+		Issuers: []string{"https://golang.oktapreview.com"},
 	}
 
 	jv, _ := jvs.New()
@@ -188,7 +201,7 @@ func Test_invalid_formatting_of_id_token_throws_an_error(t *testing.T) {
 
 func Test_an_id_token_header_that_is_improperly_formatted_throws_an_error(t *testing.T) {
 	jvs := JwtVerifier{
-		Issuer: "https://golang.oktapreview.com",
+		Issuers: []string{"https://golang.oktapreview.com"},
 	}
 
 	jv, _ := jvs.New()
@@ -202,7 +215,7 @@ func Test_an_id_token_header_that_is_improperly_formatted_throws_an_error(t *tes
 
 func Test_an_id_token_header_that_is_not_decoded_into_json_throws_an_error(t *testing.T) {
 	jvs := JwtVerifier{
-		Issuer: "https://golang.oktapreview.com",
+		Issuers: []string{"https://golang.oktapreview.com"},
 	}
 
 	jv, _ := jvs.New()
@@ -216,7 +229,7 @@ func Test_an_id_token_header_that_is_not_decoded_into_json_throws_an_error(t *te
 
 func Test_an_id_token_header_that_is_not_contain_the_correct_parts_throws_an_error(t *testing.T) {
 	jvs := JwtVerifier{
-		Issuer: "https://golang.oktapreview.com",
+		Issuers: []string{"https://golang.oktapreview.com"},
 	}
 
 	jv, _ := jvs.New()
@@ -236,7 +249,7 @@ func Test_an_id_token_header_that_is_not_contain_the_correct_parts_throws_an_err
 
 func Test_an_id_token_header_that_is_not_rs256_throws_an_error(t *testing.T) {
 	jvs := JwtVerifier{
-		Issuer: "https://golang.oktapreview.com",
+		Issuers: []string{"https://golang.oktapreview.com"},
 	}
 
 	jv, _ := jvs.New()
@@ -251,7 +264,7 @@ func Test_an_id_token_header_that_is_not_rs256_throws_an_error(t *testing.T) {
 // ACCESS TOKEN TESTS
 func Test_invalid_formatting_of_access_token_throws_an_error(t *testing.T) {
 	jvs := JwtVerifier{
-		Issuer: "https://golang.oktapreview.com",
+		Issuers: []string{"https://golang.oktapreview.com"},
 	}
 
 	jv, _ := jvs.New()
@@ -269,7 +282,7 @@ func Test_invalid_formatting_of_access_token_throws_an_error(t *testing.T) {
 
 func Test_an_access_token_header_that_is_improperly_formatted_throws_an_error(t *testing.T) {
 	jvs := JwtVerifier{
-		Issuer: "https://golang.oktapreview.com",
+		Issuers: []string{"https://golang.oktapreview.com"},
 	}
 
 	jv, _ := jvs.New()
@@ -283,7 +296,7 @@ func Test_an_access_token_header_that_is_improperly_formatted_throws_an_error(t 
 
 func Test_an_access_token_header_that_is_not_decoded_into_json_throws_an_error(t *testing.T) {
 	jvs := JwtVerifier{
-		Issuer: "https://golang.oktapreview.com",
+		Issuers: []string{"https://golang.oktapreview.com"},
 	}
 
 	jv, _ := jvs.New()
@@ -297,7 +310,7 @@ func Test_an_access_token_header_that_is_not_decoded_into_json_throws_an_error(t
 
 func Test_an_access_token_header_that_is_not_contain_the_correct_parts_throws_an_error(t *testing.T) {
 	jvs := JwtVerifier{
-		Issuer: "https://golang.oktapreview.com",
+		Issuers: []string{"https://golang.oktapreview.com"},
 	}
 
 	jv, _ := jvs.New()
@@ -317,7 +330,7 @@ func Test_an_access_token_header_that_is_not_contain_the_correct_parts_throws_an
 
 func Test_an_access_token_header_that_is_not_rs256_throws_an_error(t *testing.T) {
 	jvs := JwtVerifier{
-		Issuer: "https://golang.oktapreview.com",
+		Issuers: []string{"https://golang.oktapreview.com"},
 	}
 
 	jv, _ := jvs.New()
@@ -404,7 +417,7 @@ func Test_a_successful_authentication_can_have_its_tokens_parsed(t *testing.T) {
 	tv["aud"] = os.Getenv("CLIENT_ID")
 	tv["nonce"] = nonce
 	jv := JwtVerifier{
-		Issuer:           os.Getenv("ISSUER"),
+		Issuers:          []string{os.Getenv("ISSUER")},
 		ClaimsToValidate: tv,
 	}
 
@@ -428,7 +441,7 @@ func Test_a_successful_authentication_can_have_its_tokens_parsed(t *testing.T) {
 	tv["aud"] = "api://default"
 	tv["cid"] = os.Getenv("CLIENT_ID")
 	jv = JwtVerifier{
-		Issuer:           os.Getenv("ISSUER"),
+		Issuers:          []string{os.Getenv("ISSUER")},
 		ClaimsToValidate: tv,
 	}
 
@@ -452,7 +465,7 @@ func Test_a_successful_authentication_can_have_its_tokens_parsed(t *testing.T) {
 	tv = map[string]string{}
 	tv["aud"] = "api://default"
 	jv = JwtVerifier{
-		Issuer:           "https://golang-sdk-oie.oktapreview.com/oauth2/default",
+		Issuers:          []string{"https://golang-sdk-oie.oktapreview.com/oauth2/default"},
 		ClaimsToValidate: tv,
 	}
 
@@ -483,7 +496,7 @@ func TestWhenFetchMetaDataHas404(t *testing.T) {
 	httpmock.RegisterResponder("GET", issuer, responder)
 
 	jvs := JwtVerifier{
-		Issuer: "https://example.com",
+		Issuers: []string{"https://example.com"},
 	}
 	jv, _ := jvs.New()
 	token := `eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Im15b3JnIn0.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.ORhY_syF7eW3e4-h2Lt0i2-7yWSr3GFu4XdHtsNQTquvnrVLN2VhM6gDhoaVtZutuVpDQD-Srd6haKtQTEffrUl2IM6erWVPKNlG_ljdm2hDQ4cw58hs9CJkTkPte4RAtFwsq-zLebdk_eF__rMYqwfgkgKK_13FoG0u8nEVtSoK_2gYBPrdFONC08Uwwre_iUz1MTHugWNcITT3u866UHeNHnRARAIn5L-rKMiEH6sQyhDoGqLyfL5xpn6d1xkxtEgqvoj7F-L4Cw87i4Jzmxl8Eo3xseBe0EGU0s-zMOzqWWVBrcG_pxA9IakgNPHGiRmoQk_rc3796FuwAkYZOA`
@@ -570,7 +583,7 @@ func TestRaceCondition(t *testing.T) {
 	tv["aud"] = os.Getenv("CLIENT_ID")
 	tv["nonce"] = nonce
 	jv := JwtVerifier{
-		Issuer:           os.Getenv("ISSUER"),
+		Issuers:          []string{os.Getenv("ISSUER")},
 		ClaimsToValidate: tv,
 	}
 
@@ -594,7 +607,7 @@ func TestRaceCondition(t *testing.T) {
 	tv["aud"] = "api://default"
 	tv["cid"] = os.Getenv("CLIENT_ID")
 	jv = JwtVerifier{
-		Issuer:           os.Getenv("ISSUER"),
+		Issuers:          []string{os.Getenv("ISSUER")},
 		ClaimsToValidate: tv,
 	}
 

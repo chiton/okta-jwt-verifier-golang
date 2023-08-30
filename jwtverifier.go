@@ -38,7 +38,7 @@ var (
 )
 
 type JwtVerifier struct {
-	Issuer string
+	Issuers []string
 
 	ClaimsToValidate map[string]string
 
@@ -340,14 +340,17 @@ func (j *JwtVerifier) validateIat(iat interface{}) error {
 }
 
 func (j *JwtVerifier) validateIss(issuer interface{}) error {
-	if issuer != j.Issuer {
-		return fmt.Errorf("iss: %s does not match %s", issuer, j.Issuer)
+	for _, iss := range j.Issuers {
+		if issuer == iss {
+			return nil
+		}
 	}
-	return nil
+
+	return fmt.Errorf("iss: %s does not match %q", issuer, j.Issuers)
 }
 
 func (j *JwtVerifier) getMetaData() (map[string]interface{}, error) {
-	metaDataUrl := j.Issuer + j.Discovery.GetWellKnownUrl()
+	metaDataUrl := j.Issuers[0] + j.Discovery.GetWellKnownUrl()
 
 	value, err := j.metadataCache.Get(metaDataUrl)
 	if err != nil {
